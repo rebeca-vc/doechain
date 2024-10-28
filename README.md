@@ -1,2 +1,2 @@
-# doechain
-A blockchain solution for safer donations
+# Doechain
+A blockchain solution for safer donations.
