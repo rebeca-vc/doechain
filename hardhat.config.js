@@ -1,13 +1,16 @@
 require("dotenv").config();
-require("@nomiclabs/hardhat-ethers");
+// require("@nomiclabs/hardhat-ethers");
+require("@nomicfoundation/hardhat-toolbox");
+
+const { PRIVATE_KEY, BESU_NODE_URL } = process.env
 
 module.exports = {
   defaultNetwork: "besu",
   networks: {
     hardhat: {},
     besu: {
-      url: process.env.BESU_NODE_URL,
-      accounts: [process.env.PRIVATE_KEY]
+      url: BESU_NODE_URL,
+      accounts: [PRIVATE_KEY]
     }
   },
   solidity: "0.8.4",
