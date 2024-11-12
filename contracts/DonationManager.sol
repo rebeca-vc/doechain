@@ -14,9 +14,9 @@ contract DonationManager {
 
     // Donation Struct
     struct Donation {
+        address donor;
         uint256 amount;
         uint256 timestamp;
-        address donor;
     }
     
     // Contract state
@@ -60,7 +60,7 @@ contract DonationManager {
         emit OrganizationRegistered(_walletAddress, _name);
     }
 
-     // Donate to a Specific Organization
+    // Donate to a Specific Organization
     function donate(address _orgAddress) public payable {
         require(organizations[_orgAddress].isRegistered, "Org not found.");
         require(msg.value > 0, "Donation must be greater than zero.");

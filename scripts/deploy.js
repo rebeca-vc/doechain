@@ -1,8 +1,7 @@
 async function main() {
-    const DonationManager = await ethers.getContractFactory("DonationManager");
-    const donationManager = await DonationManager.deploy();
-    await donationManager.deployed();
-    console.log("DonationManager deployed to:", donationManager.address);
+    const DonationManager = await ethers.deployContract("DonationManager");
+    await DonationManager.waitForDeployment();
+    console.log("DonationManager deployed to:", DonationManager.target);
   }
   
   main()
