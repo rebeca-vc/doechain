@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-
 contract DonationManager {
 
     // Organization Struct
@@ -18,19 +17,27 @@ contract DonationManager {
         uint256 amount;
         uint256 timestamp;
     }
+
+    // Milestone Struct
+    struct Milestone {
+        uint256 targetAmount;      // Valor alvo da milestone
+        bool isAchieved;           // Se o marco foi alcançado
+    }
     
     // Contract state
     address public owner;
     mapping(address => Organization) public organizations;
     mapping(address => Donation[]) public donationsByDonor; // Donation history by Donor
     mapping(address => Donation[]) public donationsByOrganization; // Donation history by Organization
+    mapping(address => Milestone[]) public milestonesByOrganization; // Milestones by Organization
 
     // Events
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event OrganizationRegistered(address indexed orgAddress, string name);
     event DonationReceived(address indexed orgAddress, address indexed donor, uint256 amount);
+    event MilestoneAchieved(address indexed orgAddress, uint256 milestoneIndex, uint256 targetAmount);
 
-    // Defines the deployer as the inicial owner
+    // Defines the deployer as the initial owner
     constructor() {
         owner = msg.sender;
     }
@@ -50,7 +57,7 @@ contract DonationManager {
 
     // Function to register a new Organization
     function registerOrganization(string memory _name, address payable _walletAddress) public onlyOwner {
-        require(!organizations[_walletAddress].isRegistered, "Organizacao ja registrada.");
+        require(!organizations[_walletAddress].isRegistered, "Organization already registered.");
         organizations[_walletAddress] = Organization({
             name: _name,
             walletAddress: _walletAddress,
@@ -62,7 +69,7 @@ contract DonationManager {
 
     // Donate to a Specific Organization
     function donate(address _orgAddress) public payable {
-        require(organizations[_orgAddress].isRegistered, "Org not found.");
+        require(organizations[_orgAddress].isRegistered, "Organization not found.");
         require(msg.value > 0, "Donation must be greater than zero.");
 
         // Updates the organization funds
@@ -84,11 +91,36 @@ contract DonationManager {
         organizations[_orgAddress].walletAddress.transfer(msg.value);
 
         emit DonationReceived(_orgAddress, msg.sender, msg.value);
+
+        // Check if any milestone is achieved
+        _checkMilestones(_orgAddress);
     }
 
-     // See total amount received by an Organization
+    // Function to register a milestone for an Organization
+    function addMilestone(address _orgAddress, uint256 _targetAmount) public onlyOwner {
+        require(organizations[_orgAddress].isRegistered, "Organization not found.");
+        milestonesByOrganization[_orgAddress].push(Milestone({
+            targetAmount: _targetAmount,
+            isAchieved: false
+        }));
+    }
+
+    // Internal function to check and trigger milestone achievements
+    function _checkMilestones(address _orgAddress) internal {
+        uint256 totalReceived = organizations[_orgAddress].totalReceived;
+        Milestone[] storage milestones = milestonesByOrganization[_orgAddress];
+        
+        for (uint256 i = 0; i < milestones.length; i++) {
+            if (!milestones[i].isAchieved && totalReceived >= milestones[i].targetAmount) {
+                milestones[i].isAchieved = true;
+                emit MilestoneAchieved(_orgAddress, i, milestones[i].targetAmount);
+            }
+        }
+    }
+
+    // See total amount received by an Organization
     function getTotalReceivedByOrganization(address _orgAddress) public view returns (uint256) {
-        require(organizations[_orgAddress].isRegistered, "Org. not found.");
+        require(organizations[_orgAddress].isRegistered, "Organization not found.");
         return organizations[_orgAddress].totalReceived;
     }
 
@@ -99,7 +131,13 @@ contract DonationManager {
 
     // All donations made to an Organization
     function getDonationsByOrganization(address _orgAddress) public view returns (Donation[] memory) {
-        require(organizations[_orgAddress].isRegistered, "Org. not found.");
+        require(organizations[_orgAddress].isRegistered, "Organization not found.");
         return donationsByOrganization[_orgAddress];
+    }
+
+    // Get milestones for an organization
+    function getMilestonesByOrganization(address _orgAddress) public view returns (Milestone[] memory) {
+        require(organizations[_orgAddress].isRegistered, "Organization not found.");
+        return milestonesByOrganization[_orgAddress];
     }
 }

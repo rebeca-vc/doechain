@@ -1,5 +1,7 @@
+const { CONTRACT_ADDR } = process.env;
+
 async function main() {
-    const contractAddress = "0xC8c03647d39a96f02f6Ce8999bc22493C290e734"; 
+    const contractAddress = CONTRACT_ADDR; 
     const DonationManager = await ethers.getContractFactory("DonationManager");
     const contract = DonationManager.attach(contractAddress);
 
