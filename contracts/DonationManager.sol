@@ -16,12 +16,13 @@ contract DonationManager {
         address donor;
         uint256 amount;
         uint256 timestamp;
+        address organization;
     }
 
     // Milestone Struct
     struct Milestone {
-        uint256 targetAmount;      // Valor alvo da milestone
-        bool isAchieved;           // Se o marco foi alcançado
+        uint256 targetAmount;      
+        bool isAchieved;           
     }
     
     // Contract state
@@ -79,12 +80,14 @@ contract DonationManager {
         donationsByDonor[msg.sender].push(Donation({
             donor: msg.sender,
             amount: msg.value,
-            timestamp: block.timestamp
+            timestamp: block.timestamp,
+            organization: _orgAddress
         }));
         donationsByOrganization[_orgAddress].push(Donation({
             donor: msg.sender,
             amount: msg.value,
-            timestamp: block.timestamp
+            timestamp: block.timestamp,
+            organization: _orgAddress
         }));
 
         // Transfers the value directly to the Organization

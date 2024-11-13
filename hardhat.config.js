@@ -1,5 +1,4 @@
 require("dotenv").config();
-// require("@nomiclabs/hardhat-ethers");
 require("@nomicfoundation/hardhat-toolbox");
 
 const { PRIVATE_KEY, BESU_NODE_URL } = process.env
