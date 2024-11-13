@@ -137,7 +137,7 @@ async function listMilestoneByOrganization() {
         const contract = await getContract();
         const donations = await contract.getMilestonesByOrganization(orgAddress);
         donations.forEach((donation, index) => {
-            console.log(`Donation ${index + 1}:`);
+            console.log(`Milestone ${index + 1}:`);
             console.log(`- Target Amout: ${ethers.formatEther(donation.targetAmount)}`);
             console.log(`- Achieved: ${donation.isAchieved}`);
         });

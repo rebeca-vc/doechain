@@ -26,6 +26,7 @@ contract DonationManager {
     }
     
     // Contract state
+
     address public owner;
     mapping(address => Organization) public organizations;
     mapping(address => Donation[]) public donationsByDonor; // Donation history by Donor
@@ -33,6 +34,7 @@ contract DonationManager {
     mapping(address => Milestone[]) public milestonesByOrganization; // Milestones by Organization
 
     // Events
+    
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event OrganizationRegistered(address indexed orgAddress, string name);
     event DonationReceived(address indexed orgAddress, address indexed donor, uint256 amount);
@@ -42,6 +44,8 @@ contract DonationManager {
     constructor() {
         owner = msg.sender;
     }
+
+    // Ownership
 
     // Access modifier: Only the owner can execute this function
     modifier onlyOwner() {
@@ -56,6 +60,8 @@ contract DonationManager {
         owner = newOwner;
     }
 
+    // Organizarion
+
     // Function to register a new Organization
     function registerOrganization(string memory _name, address payable _walletAddress) public onlyOwner {
         require(!organizations[_walletAddress].isRegistered, "Organization already registered.");
@@ -67,6 +73,8 @@ contract DonationManager {
         });
         emit OrganizationRegistered(_walletAddress, _name);
     }
+
+    // Donation
 
     // Donate to a Specific Organization
     function donate(address _orgAddress) public payable {
@@ -99,6 +107,8 @@ contract DonationManager {
         _checkMilestones(_orgAddress);
     }
 
+    // Milestone
+
     // Function to register a milestone for an Organization
     function addMilestone(address _orgAddress, uint256 _targetAmount) public onlyOwner {
         require(organizations[_orgAddress].isRegistered, "Organization not found.");
@@ -120,6 +130,9 @@ contract DonationManager {
             }
         }
     }
+
+
+    // Listing
 
     // See total amount received by an Organization
     function getTotalReceivedByOrganization(address _orgAddress) public view returns (uint256) {
